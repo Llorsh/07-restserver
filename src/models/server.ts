@@ -1,13 +1,19 @@
 import express, { NextFunction, Request, Response } from 'express';
+import cors from 'cors';
+import { userRoutes } from '../routes/user.routes';
 
 export default class Server {
 
     app: any;
     port: string | number;
+    paths: { users: string; };
 
     constructor() {
         this.app = express();
         this.port = process.env.PORT || 3000;
+        this.paths = {
+            users: '/api/users'
+        };
 
         // Middlewares
         this.middlewares();
@@ -17,35 +23,19 @@ export default class Server {
     }
 
     middlewares() {
+        // CORS
+        this.app.use(cors());
+
+        // Parsed del body
+        this.app.use(express.json());
+
         // DIRECTORIO PUBLICO
         this.app.use(express.static('public'));
     }
 
 
     routes() {
-        this.app.get('/api', (req: Request, res: Response, next: NextFunction) => {
-            res.status(403).json({
-                msg: 'get API'
-            })
-        });
-
-        this.app.post('/api', (req: Request, res: Response, next: NextFunction) => {
-            res.status(403).json({
-                msg: 'post API'
-            })
-        });
-
-        this.app.put('/api', (req: Request, res: Response, next: NextFunction) => {
-            res.status(403).json({
-                msg: 'put API'
-            })
-        });
-
-        this.app.delete('/api', (req: Request, res: Response, next: NextFunction) => {
-            res.status(403).json({
-                msg: 'delete API'
-            })
-        });
+        this.app.use(this.paths.users, userRoutes)
     }
 
     start() {
