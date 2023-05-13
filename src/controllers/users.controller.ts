@@ -5,12 +5,22 @@ import userModel from "../models/user.model";
 
 const usersGet = async (req: Request, res: Response, next: NextFunction) => {
 
-    const { name, lastName } = req.query;
+    const { limit = 5, page = 0 } = req.query;
+
+    const query = { status: true };
+
+    const [users, count] = await Promise.all([
+        userModel.find(query)
+            .limit(Number(limit))
+            .skip(Number(page) * Number(limit)),
+        userModel.countDocuments(query)
+    ]);
 
     res.json({
         msg: 'get API CONTROLLER',
-        name,
-        lastName
+        count,
+        users
+
     })
 }
 
@@ -50,15 +60,32 @@ const usersPut = async (req: Request, res: Response, next: NextFunction) => {
 
     const { id } = req.params;
 
+    const { _id, password, google, ...rest } = req.body;
+
+    // TODO validar contra base de datos
+    if (password) {
+        // Encriptar contraseña
+        const salt = bcrypt.genSaltSync();
+        rest.password = bcrypt.hashSync(password, salt);
+    }
+
+    const user = await userModel.findByIdAndUpdate(id, rest);
+
     res.json({
-        msg: 'put API CONTROLLER',
-        id
+        msg: 'Usuario actualizado correctamente',
+        user
     })
 }
 
 const usersDelete = async (req: Request, res: Response, next: NextFunction) => {
+
+    const { id } = req.params;
+
+    const user = await userModel.findByIdAndUpdate(id, { status: false });
+
     res.json({
-        msg: 'delete API CONTROLLER'
+        msg: 'Usuario eliminado correctamente',
+        user
     })
 }
 
