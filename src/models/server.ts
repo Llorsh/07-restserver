@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import { userRoutes } from '../routes/user.routes';
+import { dbConnection } from '../database/config.db';
 
 export default class Server {
 
@@ -15,11 +16,18 @@ export default class Server {
             users: '/api/users'
         };
 
+        // Conectar db
+        this.dbConnection();
+
         // Middlewares
         this.middlewares();
 
         // Routes
         this.routes();
+    }
+
+    async dbConnection() {
+        await dbConnection();
     }
 
     middlewares() {

@@ -1,4 +1,8 @@
 import { NextFunction, Request, Response } from "express";
+import bcrypt from 'bcrypt';
+
+import userModel from "../models/user.model";
+import { validationResult } from "express-validator";
 
 const usersGet = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -13,13 +17,47 @@ const usersGet = async (req: Request, res: Response, next: NextFunction) => {
 
 const usersPost = async (req: Request, res: Response, next: NextFunction) => {
 
-    const { name, age } = req.body;
+    const errors = validationResult(req);
 
-    res.json({
-        msg: 'post API CONTROLLER',
-        name,
-        age
-    })
+    if (!errors.isEmpty()) {
+        return res.status(400).json(errors)
+    }
+
+    try {
+        const { name, email, password, img, role } = req.body;
+
+        const user = new userModel({ name, email, password, img, role });
+
+        const emailExist = await userModel.findOne({ email });
+
+        if (emailExist) {
+            return res.status(400).json({
+                msg: 'Email already exists'
+            })
+        }
+
+
+
+        // Encriptar contraseña
+        const salt = bcrypt.genSaltSync();
+        user.password = bcrypt.hashSync(password, salt);
+
+        await user.save();
+
+        res.json({
+            msg: 'User created successfully',
+            user
+        })
+    } catch (error) {
+
+
+
+        console.log(error)
+        res.status(500).json({
+            msg: 'Error creating user',
+            error
+        })
+    }
 }
 
 const usersPut = async (req: Request, res: Response, next: NextFunction) => {
