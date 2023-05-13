@@ -8,7 +8,6 @@ interface IUser {
     role: string;
     status: boolean;
     isGoogle: boolean;
-
 }
 
 const UserSchema = new Schema<IUser>({
@@ -30,8 +29,7 @@ const UserSchema = new Schema<IUser>({
     },
     role: {
         type: String,
-        required: true,
-        enum: ['ADMIN_ROLE', 'USER_ROLE']
+
     },
     status: {
         type: Boolean,
@@ -42,6 +40,11 @@ const UserSchema = new Schema<IUser>({
         default: false
     }
 });
+
+UserSchema.methods.toJSON = function () {
+    const { __v, password, ...user } = this.toObject();
+    return user;
+}
 
 
 export default model<IUser>('User', UserSchema);
