@@ -10,6 +10,7 @@ router.post('/', [
 
     check('email', 'El correo no es valido').isEmail(),
     check('name', 'El nombre es obligatorio').not().isEmpty(),
+    check('password', 'La contraseña es obligatoria').not().isEmpty(),
 ], usersPost);
 
 router.put('/:id', usersPut);
