@@ -1,10 +1,8 @@
 import { Router } from "express";
 import { usersDelete, usersGet, usersPost, usersPut } from "../controllers/users.controller";
 import { check } from "express-validator";
-import { validateFields } from "../middlewares/validate.fields.middleware";
 import { emailExist, isValidRole, userExistById } from "../helpers/db.validators";
-import { validateJWT } from "../middlewares/validate.jwt.middleware";
-import { hasRole, isAdminRole } from "../middlewares/validate.role.middleware";
+import { hasRole, validateFields, validateJWT } from "../middlewares";
 
 const router: Router = Router();
 
