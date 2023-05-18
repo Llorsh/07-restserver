@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import bcrypt from 'bcrypt';
 
 import userModel from "../models/user.model";
+import { CustomRequest } from "../middlewares/validate.jwt.middleware";
 
 const usersGet = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -77,9 +78,11 @@ const usersPut = async (req: Request, res: Response, next: NextFunction) => {
     })
 }
 
-const usersDelete = async (req: Request, res: Response, next: NextFunction) => {
+const usersDelete = async (req: CustomRequest, res: Response, next: NextFunction) => {
 
     const { id } = req.params;
+
+    console.log( req.user)
 
     const user = await userModel.findByIdAndUpdate(id, { status: false });
 
